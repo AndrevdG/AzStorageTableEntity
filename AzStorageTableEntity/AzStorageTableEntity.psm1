@@ -216,7 +216,9 @@ function Add-StorageTableRow {
         $rowKey,
 
         [Parameter(Mandatory=$false)]
-        [hashTable]$property = @{}
+        [hashTable]$property = @{},
+
+        [Switch]$returnContent
     )
 
     # if debug is enabled, also force verbose messages
@@ -231,6 +233,11 @@ function Add-StorageTableRow {
 
     Write-Verbose "Creating insert request parameter object "
     $parameters = _createRequestParameters -table $table -method "Post"
+
+    # Add header to prevent return body, unless requested
+    if (-Not $returnContent) {
+        $parameters.headers.add("Prefer", "return-no-content")
+    }
 
     # debug
     Write-Debug "Outputting parameter object"
@@ -259,11 +266,7 @@ function Remove-StorageTableRow {
 
         [Parameter(Mandatory=$true)]
         [string]
-        $rowKey,
-
-        [Parameter(Mandatory=$false)]
-        [string]
-        $etag
+        $rowKey
     )
 
     # if debug is enabled, also force verbose messages
@@ -273,11 +276,9 @@ function Remove-StorageTableRow {
 
     Write-Verbose "Creating delete request parameter object "
     $parameters = _createRequestParameters -table $table -method "Delete" -uriPathExtension ("(PartitionKey='{0}',RowKey='{1}')" -f $partitionKey, $rowKey)
-    if ($etag) {
-        $parameters.headers.add("If-Match", $etag)
-    } else {
-        $parameters.headers.add("If-Match", "*")
-    }
+
+    $parameters.headers.add("If-Match", "*")
+
 
     # debug
     Write-Debug "Outputting parameter object"
@@ -348,12 +349,12 @@ function Get-StorageTableRow {
 
         [Parameter(ParameterSetName="GetAll")]
 		[Parameter(ParameterSetName="byPartitionKey")]
-		[Parameter(ParameterSetName="byRowKeys")]
+		[Parameter(ParameterSetName="byRowKey")]
 		[Parameter(ParameterSetName="byCustomFilter")]
 		[System.Collections.Generic.List[string]]$selectColumn,
 
         [Parameter(Mandatory=$true,ParameterSetName='byPartitionKey')]
-        [Parameter(ParameterSetName='byRowKey')]
+        [Parameter(Mandatory=$true,ParameterSetName='byRowKey')]
         [string]
         $partitionKey,
 
@@ -376,7 +377,7 @@ function Get-StorageTableRow {
     If ($PSCmdlet.ParameterSetName -eq "byPartitionKey"){
         [string]$filter = ("PartitionKey eq '{0}'" -f $partitionKey)
     } elseif ($PSCmdlet.ParameterSetName -eq "byRowKey"){
-        [string]$filter = ("PartitionKey eq '{0}' and RowKey eq {1}" -f $partitionKey, $rowKey)
+        [string]$filter = ("PartitionKey eq '{0}' and RowKey eq '{1}'" -f $partitionKey, $rowKey)
     } elseif ($PSCmdlet.ParameterSetName -eq "byCustomFilter"){
         [string]$filter = $customFilter
     } else {
