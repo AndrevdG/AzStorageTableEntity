@@ -25,7 +25,7 @@ function _createRequestParameters {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
-        [Microsoft.Azure.Cosmos.Table.CloudTable]
+        [Microsoft.WindowsAzure.Commands.Common.Storage.ResourceModel.AzureStorageTable]
         $table,
 
         [Parameter(Mandatory=$true)]
@@ -158,7 +158,7 @@ function Update-StorageTableRow {
     # insert or update a table row: https://docs.microsoft.com/en-us/rest/api/storageservices/insert-or-replace-entity
     param (
         [Parameter(Mandatory=$true)]
-        [Microsoft.Azure.Cosmos.Table.CloudTable]
+        [Microsoft.WindowsAzure.Commands.Common.Storage.ResourceModel.AzureStorageTable]
         $table,
 
         [Parameter(Mandatory=$true)]
@@ -204,7 +204,7 @@ function Add-StorageTableRow {
     # insert a table row: https://docs.microsoft.com/en-us/rest/api/storageservices/insert-entity
     param (
         [Parameter(Mandatory=$true)]
-        [Microsoft.Azure.Cosmos.Table.CloudTable]
+        [Microsoft.WindowsAzure.Commands.Common.Storage.ResourceModel.AzureStorageTable]
         $table,
 
         [Parameter(Mandatory=$true)]
@@ -257,7 +257,7 @@ function Remove-StorageTableRow {
     # delete a table row: https://docs.microsoft.com/en-us/rest/api/storageservices/delete-entity1
     param (
         [Parameter(Mandatory=$true)]
-        [Microsoft.Azure.Cosmos.Table.CloudTable]
+        [Microsoft.WindowsAzure.Commands.Common.Storage.ResourceModel.AzureStorageTable]
         $table,
 
         [Parameter(Mandatory=$true)]
@@ -297,7 +297,7 @@ function Get-StorageTableNextRow {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
     [Parameter(Mandatory=$true)]
-        [Microsoft.Azure.Cosmos.Table.CloudTable]
+        [Microsoft.WindowsAzure.Commands.Common.Storage.ResourceModel.AzureStorageTable]
         $table,
 
         [Parameter(Mandatory=$true)]
@@ -344,7 +344,7 @@ function Get-StorageTableRow {
         [Parameter(ParameterSetName='byPartitionKey')]
         [Parameter(ParameterSetName='byRowKey')]
         [Parameter(ParameterSetName="byCustomFilter")]
-        [Microsoft.Azure.Cosmos.Table.CloudTable]
+        [Microsoft.WindowsAzure.Commands.Common.Storage.ResourceModel.AzureStorageTable]
         $table,
 
         [Parameter(ParameterSetName="GetAll")]
