@@ -29,7 +29,7 @@ function _createRequestParameters {
         $table,
 
         [Parameter(Mandatory=$true)]
-        [validateset('Get', 'Post', 'Put', 'Delete')]
+        [validateset('Get', 'Post', 'Put', 'Merge', 'Delete')]
         [string]
         $method,
 
@@ -155,7 +155,7 @@ function _processResult {
 
 function Update-StorageTableRow {
     [CmdletBinding(SupportsShouldProcess)]
-    # insert or update a table row: https://docs.microsoft.com/en-us/rest/api/storageservices/insert-or-replace-entity
+    # Update a table row: https://learn.microsoft.com/en-us/rest/api/storageservices/merge-entity
     param (
         [Parameter(Mandatory=$true)]
         [Microsoft.WindowsAzure.Commands.Common.Storage.ResourceModel.AzureStorageTable]
@@ -184,7 +184,7 @@ function Update-StorageTableRow {
     $body | Out-String | Write-Debug
 
     Write-Verbose "Creating update request parameter object "
-    $parameters = _createRequestParameters -table $table -method "Put" -uriPathExtension ("(PartitionKey='{0}',RowKey='{1}')" -f $partitionKey, $rowKey)
+    $parameters = _createRequestParameters -table $table -method "Merge" -uriPathExtension ("(PartitionKey='{0}',RowKey='{1}')" -f $partitionKey, $rowKey)
 
     # debug
     Write-Debug "Outputting parameter object"
@@ -193,6 +193,52 @@ function Update-StorageTableRow {
 
     if ($PSCmdlet.ShouldProcess($table.Uri.ToString(), "Update-StorageTableRow")) {
         Write-Verbose "Updating entity in storage table"
+        $result = Invoke-WebRequest -Body $body @parameters
+
+        return(_processResult -result $result)
+    }
+}
+
+function Replace-StorageTableRow {
+    [CmdletBinding(SupportsShouldProcess)]
+    # insert or replace a table row: https://docs.microsoft.com/en-us/rest/api/storageservices/insert-or-replace-entity
+    param (
+        [Parameter(Mandatory=$true)]
+        [Microsoft.WindowsAzure.Commands.Common.Storage.ResourceModel.AzureStorageTable]
+        $table,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $partitionKey,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $rowKey,
+
+        [Parameter(Mandatory=$false)]
+        [hashTable]$property = @{}
+    )
+
+    # if debug is enabled, also force verbose messages
+    if ($DebugPreference -ne 'SilentlyContinue') {$VerbosePreference = 'Continue'}
+
+    Write-Verbose "Starting function Replace-StorageTableRow"
+
+    Write-Verbose ("Creating body for replace request with partitionKey {0} and rowKey {1}" -f $partitionKey, $rowKey)
+    $body = _createBody -partitionKey $partitionKey -rowKey $rowKey -property $property
+    Write-Debug "Outputting body"
+    $body | Out-String | Write-Debug
+
+    Write-Verbose "Creating replace request parameter object "
+    $parameters = _createRequestParameters -table $table -method "Put" -uriPathExtension ("(PartitionKey='{0}',RowKey='{1}')" -f $partitionKey, $rowKey)
+
+    # debug
+    Write-Debug "Outputting parameter object"
+    $parameters | Out-String | Write-Debug
+    $parameters.headers | Out-String | Write-Debug
+
+    if ($PSCmdlet.ShouldProcess($table.Uri.ToString(), "Replace-StorageTableRow")) {
+        Write-Verbose "Replacing entity in storage table"
         $result = Invoke-WebRequest -Body $body @parameters
 
         return(_processResult -result $result)

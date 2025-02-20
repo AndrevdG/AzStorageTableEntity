@@ -17,6 +17,7 @@ When imported, this module will provide the following functions:
 - Remove-StorageTableRow
 - Add-StorageTableRow
 - Update-StorageTableRow
+- Replace-StorageTableRow
 
 It will allow you to use Table storage in:
 
@@ -58,15 +59,30 @@ Add-StorageTableRow -table $table -partitionKey 'MyPartitionKey' -rowKey 'MyRowK
 - **table**: object containing reference to the table and how to authorize (using shared key or using signed in credentials)
 - **partitionKey**: string used for the [partition](https://docs.microsoft.com/en-us/rest/api/storageservices/understanding-the-table-service-data-model#partitionkey-property) used by this entity
 - **rowKey**: [Rowkey](https://docs.microsoft.com/en-us/rest/api/storageservices/understanding-the-table-service-data-model#rowkey-property) is a unique identifier for the row
-- **property**: hashtable containing additional columns to be inserted. See the [Microsoft Documentation](https://docs.microsoft.com/en-us/rest/api/storageservices/inserting-and-updating-entities#constructing-the-json-feed) for more information
+- **property**: hashtable containing additional columns to be updated. See the [Microsoft Documentation](https://docs.microsoft.com/en-us/rest/api/storageservices/inserting-and-updating-entities#constructing-the-json-feed) for more information
 
-Used to insert or update a row into an Azure Storage Table.
+Used to update a row into an Azure Storage Table.
+
+See [Microsoft Documentation](https://learn.microsoft.com/en-us/rest/api/storageservices/merge-entity)
+
+**_Example_**
+```PowerShell
+Update-StorageTableRow -table $table -partitionKey 'MyPartitionKey' -rowKey 'MyRowKey' -property @{"CustomerCode@odata.type" = "Edm.Guid"; "CustomerCode" = "c9da6455-213d-42c9-9a79-3e9149a57833"}
+```
+
+## Replace-StorageTableRow
+- **table**: object containing reference to the table and how to authorize (using shared key or using signed in credentials)
+- **partitionKey**: string used for the [partition](https://docs.microsoft.com/en-us/rest/api/storageservices/understanding-the-table-service-data-model#partitionkey-property) used by this entity
+- **rowKey**: [Rowkey](https://docs.microsoft.com/en-us/rest/api/storageservices/understanding-the-table-service-data-model#rowkey-property) is a unique identifier for the row
+- **property**: hashtable containing additional columns to be inserted or replaced. See the [Microsoft Documentation](https://docs.microsoft.com/en-us/rest/api/storageservices/inserting-and-updating-entities#constructing-the-json-feed) for more information
+
+Used to insert or replace a row into an Azure Storage Table.
 
 See [Microsoft Documentation](https://docs.microsoft.com/en-us/rest/api/storageservices/update-entity2)
 
 **_Example_**
 ```PowerShell
-Update-StorageTableRow -table $table -partitionKey 'MyPartitionKey' -rowKey 'MyRowKey' -property @{"CustomerCode@odata.type" = "Edm.Guid"; "CustomerCode" = "c9da6455-213d-42c9-9a79-3e9149a57833"}
+Replace-StorageTableRow -table $table -partitionKey 'MyPartitionKey' -rowKey 'MyRowKey' -property @{"CustomerCode@odata.type" = "Edm.Guid"; "CustomerCode" = "c9da6455-213d-42c9-9a79-3e9149a57833"}
 ```
 
 ## Get-StorageTableRow
